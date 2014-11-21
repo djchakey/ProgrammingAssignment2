@@ -1,5 +1,5 @@
 makeCacheMatrix <- function(x = matrix(),y = list(), z = list()) {
-## Last Change 20141120 @13:00
+## Last Change 20141121 @18:41
 ## This function creates a special "matrix" object that can cache its inverse
 ## x=Input Matrix, y=Matrix Vector Cache, z=Inverse Matrix Vector Cache
 ## Get Input matrix x, See if previously cached by comparing input matrix x with those previously cached in y
@@ -8,7 +8,9 @@ makeCacheMatrix <- function(x = matrix(),y = list(), z = list()) {
 ## Loop through every entry in the list to make that determination
 ## If no match,add matrix to vector cache, obtain inverse matrix, add inverse matrix to z list cache and return matrix
 ## If we get a match, pull the cached inverse matrix from the z list and return the inverse matrix 
-## If y is the vector cache them y[1]<-list(x) would insert the matrix into position 1 of the vector list  
+## If y is the vector cache them y[1]<-list(x) would insert the matrix into position 1 of the vector list 
+## The caller would issue the function as follows:
+## retIMatrix<-makeCacheMatrix(matrix_element,cachelist_formatrix_element,cachelist_forinversematrix_element)
 nmb_rows<-0
 nmb_cols<-0
 nmb_matrices_in_ylist<-length(y)
@@ -29,9 +31,9 @@ nmb_matrices_in_zlist<-length(z)
   if (length(y)<1)
   {
     Imatrix<-cacheSolve(x,nmb_matrices_in_ylist,y,z)
-    print("1st Attempt Check Cached y Matrix")
-    print(y)
-    thelist<-list(Imatrix,y,z)
+##    print("1st Attempt Check Cached y Matrix")
+##    print(y)
+    thelist<-list(Imatrix)
     return(thelist)
   } 
 
@@ -54,20 +56,24 @@ nmb_matrices_in_zlist<-length(z)
   
   for (i in 1:nmb_matrices_in_ylist)
   {
-    answer<- x==y[[1]][[i]]
+    answer<- x==y[[i]]
     truth<-!answer
     gotamatch<-sum(truth)
-  }
+##    print("Got a Match Value")
+##    print(gotamatch)
+##    print(y[[i]])
+
     
 ## When every cell matches completely, the !answer will contain all zeroes and 
 ## the sum(truth) will equal zero
-  print(gotamatch)  
-  if (gotamatch < 1)
+
+    if (gotamatch < 1)
     {
-    print("Got a Match!")
-    thelist<-list(Imatrix,y,z)       
-    return(thelist)
-    }  
+      Imatrix<-z[[i]]
+      thelist<-list(Imatrix,y,z)       
+      return(thelist)
+    } 
+  }
             
 ## The returned list contains the following results:
 ## Inverted Matrix =  thelist[[1]] [[1]]
@@ -79,7 +85,7 @@ nmb_matrices_in_zlist<-length(z)
 ## add inverse matrix to z list cache and return matrix
   
   Imatrix<-cacheSolve(x,nmb_matrices_in_ylist,y,z)
-  thelist<-list(Imatrix,y,z)
+  thelist<-list(Imatrix)
   return(thelist)
   
 }
@@ -91,21 +97,19 @@ nmb_matrices_in_zlist<-length(z)
 cacheSolve <- function(x = matrix, cachepos=integer, y=list(), z=list()) {
 ## Returns a matrix that is the inverse of the submitted matrix 'x' along with the cached lists y and z inorder
 ## to preserve the storage locations of the callers cache memory
-  print("cacheSolve x Matrix")
-  print(x)
   Inverse_Matrix<-solve(x)
 ## cache the inverse of x on the z list at the z length + 1 position and cache the x matrix as well
   position<-cachepos + 1
   z[position]<-list(Inverse_Matrix)
   y[position]<-list(x)
-  print("Inverse Matrix")
-  print(Inverse_Matrix)
-  print("Position Index")
-  print(position)
-  print("Cached Position Y Matrix")
-  print(y[position])
-  print("Cached Position Z Matrix")
-  print(z[position])
+##  print("Inverse Matrix")
+##  print(Inverse_Matrix)
+##  print("Position Index")
+##  print(position)
+##  print("Cached Position Y Matrix")
+##  print(y[position])
+##  print("Cached Position Z Matrix")
+##  print(z[position])
   thelist<-list(Inverse_Matrix,y,z)
   return(thelist)
 }
